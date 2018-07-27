@@ -30,7 +30,7 @@
     "region": "cn-shanghai",
     "timeout": 50000
   },
-  "serviceName": "youFcServiceName",
+  "serviceName": "yourFcServiceName",
   "handler": "index.handler",
   "memorySize": 1024,
   "runtime": "nodejs8",
