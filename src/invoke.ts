@@ -73,7 +73,9 @@ export function initInvoker(options: {
     const result = JSON.parse(data);
 
     if (result.storeType === 'oss') {
-      const retBodyString = ossClient.get(result.body).content.toString();
+      const retBodyString = (await ossClient.get(
+        result.body
+      )).content.toString();
       ossClient.delete(result.body).catch(console.error);
       return retBodyString;
     }
