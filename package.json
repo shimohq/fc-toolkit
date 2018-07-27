@@ -1,6 +1,6 @@
 {
   "name": "fc-toolkit",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "fc-toolkit",
   "license": "MIT",
   "repository": "",
@@ -10,7 +10,7 @@
     "url": "https://github.com/wanming"
   },
   "keywords": [
-    ""
+    "aliyun", "fc", "function compute"
   ],
   "files": [
     "lib"

@@ -52,8 +52,8 @@ export async function publish() {
 }
 
 function pick(obj: { [x: string]: any }, ...attrs: string[]) {
-  const ret = {};
-  attrs.forEach(attr => (obj[attr] = obj[attr]));
+  const ret = {} as any;
+  attrs.forEach(attr => (ret[attr] = obj[attr]));
   return ret;
 }
 
