@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/{{github-user-name}}/{{github-app-name}}.svg?branch=master)](https://travis-ci.org/{{github-user-name}}/{{github-app-name}}.svg?branch=master)
-[![Coverage Status](https://coveralls.io/repos/github/{{github-user-name}}/{{github-app-name}}/badge.svg?branch=master)](https://coveralls.io/github/{{github-user-name}}/{{github-app-name}}?branch=master)
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
 # 阿里云函数计算工具集
@@ -12,6 +10,9 @@
 
 1. 发布函数
 2. 调用函数超过大小限制自动使用 OSS
+
+
+
 
 ## 发布函数
 
@@ -54,6 +55,8 @@
 > 由于更新代码有一定风险，暂时只支持发布新代码，不支持当前版本代码代码
 
 
+
+
 ## 调用函数
 
 ```js
@@ -78,7 +81,10 @@ const invoke = require('fc-toolkit').initInvoker({
 const result = await invoke(serviceName, functionName, body)
 ```
 
-> 如果发送的大小或者函数计算返回的结果超过了函数计算的大小限制，会自动使用 OSS 转发和收取
+如果发送的大小或者函数计算返回的结果超过了函数计算的大小限制，会自动使用 OSS 转发和收取
+
+
+
 
 ## 处理任务
 
