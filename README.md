@@ -12,6 +12,7 @@
 2. 调用函数超过大小限制自动使用 OSS
 
 <br />
+
 ## 发布函数
 
 在函数代码目录 ~/.fc-config.json 里写入自己的 fc 配置，格式如下：
@@ -48,7 +49,8 @@ Notes:
 1. 由于发布时需要外网的 region，所以函数计算代码里的配置文件里的 region 不能写`-internal`，在函数计算执行时`-internal`会自动带上；
 1. 由于更新代码有一定风险，只支持发布新代码。
 
-<br /><br />
+<br />
+
 ## 调用函数
 
 ```js
@@ -75,7 +77,8 @@ const result = await invoke(serviceName, functionName, body)
 
 如果发送的大小或者函数计算返回的结果超过了函数计算的大小限制，会自动使用 OSS 转发和收取；
 
-<br /><br />
+<br />
+
 ## 处理任务
 
 ```js
