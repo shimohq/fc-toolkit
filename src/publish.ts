@@ -4,13 +4,16 @@ const path = require('path');
 const fs = require('fs');
 const FCClient = require('@alicloud/fc2');
 const { execSync } = require('child_process');
+const filesize = require('filesize');
+
+import { getFunctionName } from './common';
 
 const cwd = process.cwd();
 
 const config = require(path.join(cwd, '.fc-config.json'));
 const pkg = require(path.join(cwd, 'package.json'));
 const serviceName = config.serviceName;
-const functionName = `${pkg.name}-${pkg.version.replace(/\./g, '_')}`;
+const functionName = getFunctionName(pkg);
 
 const client = new FCClient(config.fc.accountId, config.fc);
 
@@ -23,7 +26,12 @@ export async function publish() {
     const filepath = `/tmp/${Math.random()}.zip`;
     execSync(`zip -r ${filepath} ./ -x *.git*`, { stdio: 'inherit' });
 
-    console.log('uploading zip..');
+    console.log(
+      `zip file size is ${filesize(
+        fs.statSync(filepath).size
+      )}, uploading zip..`
+    );
+
     await client.createFunction(serviceName, {
       functionName,
       handler: 'index.handler',
@@ -33,14 +41,7 @@ export async function publish() {
       code: {
         zipFile: fs.readFileSync(filepath, 'base64'),
       },
-      ...pick(
-        config,
-        'functionName',
-        'handler',
-        'memorySize',
-        'runtime',
-        'timeout'
-      ),
+      ...pick(config, 'handler', 'memorySize', 'runtime', 'timeout'),
     });
 
     console.log(`create function ${serviceName}/${functionName} successfully!`);
@@ -53,7 +54,9 @@ export async function publish() {
 
 function pick(obj: { [x: string]: any }, ...attrs: string[]) {
   const ret = {} as any;
-  attrs.forEach(attr => (ret[attr] = obj[attr]));
+  attrs.forEach(attr => {
+    ret[attr] = obj[attr];
+  });
   return ret;
 }
 

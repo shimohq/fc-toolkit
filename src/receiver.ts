@@ -36,6 +36,9 @@ export function initReceiver(): {
 
   const reply = (callback: AliyunCallback) => {
     return async (returnValue: string) => {
+      if (typeof returnValue !== 'string') {
+        throw new Error('return value must be string');
+      }
       if (sizeof(returnValue) > OSS_THRESHOLD) {
         const filePath = uuid();
         await ossClient.put(filePath, Buffer.from(returnValue));
