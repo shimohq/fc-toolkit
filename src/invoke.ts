@@ -2,7 +2,7 @@ const OSS = require('ali-oss');
 const FCClient = require('@alicloud/fc2');
 const uuid = require('uuid/v4');
 
-import { sizeof } from './common';
+import { sizeof, retryWrapper } from './common';
 
 export function initInvoker(options: {
   oss: {
@@ -38,7 +38,7 @@ export function initInvoker(options: {
     // send via OSS
     if (sizeof(body) > ossThreshold) {
       const filePath = uuid();
-      await ossClient.put(filePath, Buffer.from(body));
+      await retryWrapper(() => ossClient.put(filePath, Buffer.from(body)));
       fcBody.push(
         JSON.stringify({
           storeType: 'oss',
@@ -54,21 +54,36 @@ export function initInvoker(options: {
       );
     }
 
-    const { data } = await fcClient.invokeFunction(...fcBody);
+    const res = await retryWrapper(async (bail: any) => {
+      try {
+        const { data } = await fcClient.invokeFunction(...fcBody);
 
-    if (typeof data === 'object') {
-      const error = new Error(data.errorMessage) as any;
-      error.errorType = data.errorType;
-      error.stackTrace = data.stackTrace;
-      throw error;
-    }
+        if (typeof data === 'object') {
+          const error = new Error(data.errorMessage) as any;
+          error.errorType = data.errorType;
+          error.stackTrace = data.stackTrace;
+          bail(error);
+          return
+        }
+  
+        return data
+      } catch (err) {
+        // socket hang up error, should retry
+        if (err.name === 'ECONNRESETError') {
+          throw err
+        }
 
-    const result = JSON.parse(data);
+        bail(err);
+      }
+    })
+    
+
+    const result = JSON.parse(res);
 
     if (result.storeType === 'oss') {
-      const retBodyString = (await ossClient.get(
+      const retBodyString = (await retryWrapper(() => ossClient.get(
         result.body
-      )).content.toString();
+      ))).content.toString();
       ossClient.delete(result.body).catch(console.error);
       return retBodyString;
     }

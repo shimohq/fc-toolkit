@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const OSS = require('ali-oss');
 const uuid = require('uuid/v4');
-import { sizeof } from './common';
+import { sizeof, retryWrapper } from './common';
 
 const OSS_THRESHOLD = 3e6;
 
@@ -26,7 +26,7 @@ export function initReceiver(): {
     const { storeType, body } = JSON.parse(event);
 
     if (storeType === 'oss') {
-      const bodyString = (await ossClient.get(body)).content.toString();
+      const bodyString = (await retryWrapper(() => ossClient.get(body))).content.toString();
       ossClient.delete(body).catch(console.error);
       return bodyString;
     }
@@ -41,7 +41,7 @@ export function initReceiver(): {
       }
       if (sizeof(returnValue) > OSS_THRESHOLD) {
         const filePath = uuid();
-        await ossClient.put(filePath, Buffer.from(returnValue));
+        await retryWrapper(() => ossClient.put(filePath, Buffer.from(returnValue)));
         const body = {
           storeType: 'oss',
           body: filePath,
