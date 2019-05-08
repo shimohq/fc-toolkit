@@ -1,4 +1,4 @@
-const retry = require('async-retry')
+const retry = require('async-retry');
 
 export function sizeof(str: string): number {
   return Buffer.byteLength(str, 'utf-8');
@@ -12,16 +12,16 @@ export function getFunctionName({ name, version }: any): string {
   return `${name}-${version.replace(/\./g, '_')}`;
 }
 
-export async function retryWrapper (execution: any, options: any = {}) {
+export async function retryWrapper(execution: any, options: any = {}) {
   return retry(
     async (bail: any) => {
-      const res = await execution(bail)
-      return res
+      const res = await execution(bail);
+      return res;
     },
     {
       retries: options.retries || 2,
       minTimeout: options.minTimeout || 1000,
-      maxTimeout: options.maxTimeout || 3000
+      maxTimeout: options.maxTimeout || 3000,
     }
-  )
+  );
 }

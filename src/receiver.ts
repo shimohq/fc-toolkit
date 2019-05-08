@@ -26,7 +26,9 @@ export function initReceiver(): {
     const { storeType, body } = JSON.parse(event);
 
     if (storeType === 'oss') {
-      const bodyString = (await retryWrapper(() => ossClient.get(body))).content.toString();
+      const bodyString = (await retryWrapper(() =>
+        ossClient.get(body)
+      )).content.toString();
       ossClient.delete(body).catch(console.error);
       return bodyString;
     }
@@ -41,7 +43,9 @@ export function initReceiver(): {
       }
       if (sizeof(returnValue) > OSS_THRESHOLD) {
         const filePath = uuid();
-        await retryWrapper(() => ossClient.put(filePath, Buffer.from(returnValue)));
+        await retryWrapper(() =>
+          ossClient.put(filePath, Buffer.from(returnValue))
+        );
         const body = {
           storeType: 'oss',
           body: filePath,

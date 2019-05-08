@@ -63,30 +63,31 @@ export function initInvoker(options: {
           error.errorType = data.errorType;
           error.stackTrace = data.stackTrace;
           bail(error);
-          return
+          return;
         }
-  
-        return data
+
+        return data;
       } catch (err) {
         // socket hang up error, should retry
         if (
-          err.name === "ECONNRESETError" ||
-          String(err.name).toLowerCase().indexOf("throttle") > -1
+          err.name === 'ECONNRESETError' ||
+          String(err.name)
+            .toLowerCase()
+            .indexOf('throttle') > -1
         ) {
           throw err;
         }
 
         bail(err);
       }
-    })
-    
+    });
 
     const result = JSON.parse(res);
 
     if (result.storeType === 'oss') {
-      const retBodyString = (await retryWrapper(() => ossClient.get(
-        result.body
-      ))).content.toString();
+      const retBodyString = (await retryWrapper(() =>
+        ossClient.get(result.body)
+      )).content.toString();
       ossClient.delete(result.body).catch(console.error);
       return retBodyString;
     }
