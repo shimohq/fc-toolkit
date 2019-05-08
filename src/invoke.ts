@@ -69,8 +69,11 @@ export function initInvoker(options: {
         return data
       } catch (err) {
         // socket hang up error, should retry
-        if (err.name === 'ECONNRESETError') {
-          throw err
+        if (
+          err.name === "ECONNRESETError" ||
+          String(err.name).toLowerCase().indexOf("throttle") > -1
+        ) {
+          throw err;
         }
 
         bail(err);
