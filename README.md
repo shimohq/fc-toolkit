@@ -34,7 +34,11 @@
   "handler": "index.handler",
   "memorySize": 1024,
   "runtime": "nodejs8",
-  "timeout": 300
+  "timeout": 300,
+  "name": "yourFcFunctionNamePrefix",
+  "version": "1.0.0,1.0.1",
+  "intall": "yarn install --production",
+  "zip": "zip -qr ${filepath} ./ -x *.git*",
 }
 ```
 
@@ -43,7 +47,9 @@
 
 Notes:
 1. `handler`,`memorySize`,`runtime`,`timeout`为可选项；
-1. 函数名格式为'tom-0_0_1'，比如 package name 为'tom', version 为 1.0.1，那么函数名为'tom-1_0_1'；
+1. `install`, `zip`为可选项, 可以自定义install和zip命令, 如使用yarn install, zip时忽略特定目录
+1. --si参数可以跳过install阶段
+1. 函数名格式为'tom-0_0_1'，比如 package name 为'tom', version 为 1.0.1，那么函数名为'tom-1_0_1'；可以在fc-config.json中修改; 如fc-config.json中version有多个, 将同时发布多个函数
 1. 由于发布时需要外网的 region，所以函数计算代码里的配置文件里的 region 不能写`-internal`，在函数计算执行时`-internal`会自动带上；
 1. 由于更新代码有一定风险，只支持发布新代码。
 
