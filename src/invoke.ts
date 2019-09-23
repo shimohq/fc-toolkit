@@ -19,6 +19,7 @@ export function initInvoker(options: {
     timeout?: number;
   };
   ossThreshold?: number;
+  noOSS?: boolean;
 }): (serviceName: string, functionName: string, body: any) => Promise<string> {
   const ossClient = new OSS(options.oss);
   const fcClient = new FCClient(options.fc.accountId, options.fc);
@@ -36,7 +37,7 @@ export function initInvoker(options: {
     const fcBody = [serviceName, functionName];
 
     // send via OSS
-    if (sizeof(body) > ossThreshold) {
+    if (sizeof(body) > ossThreshold && !options.noOSS) {
       const filePath = uuid();
       await retryWrapper(() => ossClient.put(filePath, Buffer.from(body)));
       fcBody.push(
@@ -84,7 +85,7 @@ export function initInvoker(options: {
 
     const result = JSON.parse(res);
 
-    if (result.storeType === 'oss') {
+    if (result.storeType === 'oss' && !options.noOSS) {
       const retBodyString = (await retryWrapper(() =>
         ossClient.get(result.body)
       )).content.toString();
