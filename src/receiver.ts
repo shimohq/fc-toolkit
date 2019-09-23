@@ -12,7 +12,9 @@ export function initReceiver(
   noOSS: boolean = false
 ): {
   receive: (event: string) => Promise<any>;
-  reply: (callback: AliyunCallback) => (returnValue: string, directReturn?: boolean) => Promise<void>;
+  reply: (
+    callback: AliyunCallback
+  ) => (returnValue: string, directReturn?: boolean) => Promise<void>;
 } {
   const cwd = process.cwd();
   const config = JSON.parse(

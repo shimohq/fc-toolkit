@@ -26,7 +26,6 @@ const serviceName = config.serviceName;
 // allow customize version and publish multiple functions at once
 const version = (config.version || pkg.version) as string;
 
-const zipCommand = config.zip || 'zip -qr ${filepath} ./ -x *.git*';
 const name = config.name || pkg.name;
 const functionNames = version
   .split(',')
@@ -41,7 +40,7 @@ function prepare() {
   }
   console.log('compress file..');
   const filepath = `/tmp/${Math.random()}.zip`;
-  execSync(zipCommand, { stdio: 'inherit' });
+  execSync(config.zip || `zip -qr ${filepath} ./ -x *.git*`, { stdio: 'inherit' });
 
   console.log(
     `zip file size is ${filesize(fs.statSync(filepath).size)}, uploading zip..`
