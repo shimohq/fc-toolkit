@@ -37,11 +37,11 @@ export function initReceiver(noOSS: boolean = false): {
   };
 
   const reply = (callback: AliyunCallback) => {
-    return async (returnValue: string) => {
+    return async (returnValue: string, directReturn: boolean = false) => {
       if (typeof returnValue !== 'string') {
         throw new Error('return value must be string');
       }
-      if (sizeof(returnValue) > OSS_THRESHOLD && !noOSS) {
+      if (sizeof(returnValue) > OSS_THRESHOLD && !noOSS && !directReturn) {
         const filePath = uuid();
         await retryWrapper(() =>
           ossClient.put(filePath, Buffer.from(returnValue))
