@@ -8,7 +8,7 @@ const OSS_THRESHOLD = 3e6;
 
 type AliyunCallback = (error: any, response: any) => any;
 
-export function initReceiver(): {
+export function initReceiver(noOSS: boolean = false): {
   receive: (event: string) => Promise<any>;
   reply: (callback: AliyunCallback) => (returnValue: string) => Promise<void>;
 } {
@@ -25,7 +25,7 @@ export function initReceiver(): {
   const receive = async (event: string) => {
     const { storeType, body } = JSON.parse(event);
 
-    if (storeType === 'oss') {
+    if (storeType === 'oss' && !noOSS) {
       const bodyString = (await retryWrapper(() =>
         ossClient.get(body)
       )).content.toString();
@@ -41,7 +41,7 @@ export function initReceiver(): {
       if (typeof returnValue !== 'string') {
         throw new Error('return value must be string');
       }
-      if (sizeof(returnValue) > OSS_THRESHOLD) {
+      if (sizeof(returnValue) > OSS_THRESHOLD && !noOSS) {
         const filePath = uuid();
         await retryWrapper(() =>
           ossClient.put(filePath, Buffer.from(returnValue))
