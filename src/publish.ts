@@ -26,7 +26,7 @@ const serviceName = config.serviceName;
 // allow customize version and publish multiple functions at once
 const version = (config.version || pkg.version) as string;
 
-const zipCommand = config.zip || 'zip -qr ${filepath} ./ -x *.git*'
+const zipCommand = config.zip || 'zip -qr ${filepath} ./ -x *.git*';
 const name = config.name || pkg.name;
 const functionNames = version
   .split(',')

@@ -8,7 +8,9 @@ const OSS_THRESHOLD = 3e6;
 
 type AliyunCallback = (error: any, response: any) => any;
 
-export function initReceiver(noOSS: boolean = false): {
+export function initReceiver(
+  noOSS: boolean = false
+): {
   receive: (event: string) => Promise<any>;
   reply: (callback: AliyunCallback) => (returnValue: string) => Promise<void>;
 } {
