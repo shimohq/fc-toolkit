@@ -53,7 +53,7 @@ async function publishToFc(filepath: string, functionName: string) {
     functionName,
     handler: 'index.handler',
     memorySize: 1024,
-    runtime: 'nodejs8',
+    runtime: 'nodejs10',
     timeout: 300, // second
     code: {
       zipFile: fs.readFileSync(filepath, 'base64'),
