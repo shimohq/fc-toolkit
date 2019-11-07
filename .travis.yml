@@ -15,7 +15,9 @@ before_script:
   - docker pull minio/minio
   - docker run -d -p 9000:9000 --name minio1 -e "MINIO_ACCESS_KEY=$AK" -e "MINIO_SECRET_KEY=$SK" -v /data:/data minio/minio server /data
   - docker pull minio/mc
-  - docker run -it -d --entrypoint=/bin/sh --name minio_client --link minio1:minio1 minio/mc /bin/sh -c "mc config host add minio http://minio1:9000 $AK $SK --api S3v4 && mc mb minio/$BUCKET"
+  - docker run -it -d --name minio_client --entrypoint=/bin/sh --link minio1:minio1 minio/mc
+  - docker exec -it minio_client mc config host add minio http://minio1:9000 $AK $SK --api S3v4
+  - docker exec -it minio_client mc mb $BUCKET
   - docker ps -a
 
 script:
