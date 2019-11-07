@@ -1,6 +1,6 @@
 import { Client as AWOS } from 'awos-js';
 
-import { getClientByType } from '../src/storage'
+import { getClientByType } from '../src/storage';
 
 describe('storage', () => {
   const client = getClientByType('oss', {
@@ -8,8 +8,8 @@ describe('storage', () => {
     accessKeySecret: '',
     bucket: '',
     endpoint: '',
-  })
-  expect(client instanceof AWOS).toBeTruthy()
+  });
+  expect(client instanceof AWOS).toBeTruthy();
 
   const client1 = getClientByType('aws', {
     accessKeyId: '',
@@ -18,8 +18,8 @@ describe('storage', () => {
     endpoint: '',
     s3ForcePathStyle: true,
     region: '',
-  })
-  expect(client1 instanceof AWOS).toBeTruthy()
+  });
+  expect(client1 instanceof AWOS).toBeTruthy();
 
   try {
     getClientByType('abc', {
@@ -29,8 +29,8 @@ describe('storage', () => {
       endpoint: '',
       s3ForcePathStyle: true,
       region: '',
-    })
+    });
   } catch (err) {
-    expect(err).toContain('Unknown store type:')
+    expect(err).toContain('Unknown store type:');
   }
-})
+});

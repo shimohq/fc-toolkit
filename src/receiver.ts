@@ -1,17 +1,22 @@
 const path = require('path');
 const uuid = require('uuid/v4');
 const isPlainObject = require('lodash.isplainobject');
+const isNil = require('lodash.isnil');
 
 import { sizeof, retryWrapper } from './common';
 import { MAX_RAW_PAYLOAD_SIZE } from './constants';
 import { getClientByType } from './storage';
 
 export type AliyunCallback = (error: any, response: any) => any;
-export type OSS_TYPE = 'oss' | 'aws'
-export interface IPayloadObject { [index: string]: any }
+export type OSS_TYPE = 'oss' | 'aws';
+export interface IPayloadObject {
+  [index: string]: any;
+}
 export interface IReceiveParsedPayload {
-  storeType: string,
-  body: string | IPayloadObject,
+  storeType: string;
+  ossType: string;
+  body: IPayloadObject;
+  ossKey?: string;
 }
 
 export function initReceiver(
@@ -28,30 +33,45 @@ export function initReceiver(
   const storageOptions = config[ossType] || {};
   const storageClient = getClientByType(ossType, storageOptions);
 
-  const receive = async (event: string | IReceiveParsedPayload): Promise<any> => {
+  const receive = async (
+    event: string | IReceiveParsedPayload
+  ): Promise<any> => {
     let storeType: string;
-    let body: string | IPayloadObject;
+    let ossKey: string | undefined;
+    let body: IPayloadObject;
 
     // 如果是字符串才进行 parse
     if (typeof event === 'string') {
       const eventParsed = JSON.parse(event);
       storeType = eventParsed.storeType;
+      ossKey = eventParsed.ossKey;
       body = eventParsed.body;
     } else if (isPlainObject(event)) {
       // 如果外部已经解析，此处直接取值
       storeType = event.storeType;
+      ossKey = event.ossKey;
       body = event.body;
     } else {
-      throw new Error('Unsupported event data type, should be a plain object or a string');
+      throw new Error(
+        'Unsupported event data type, should be a plain object or a string'
+      );
     }
 
     // 如果是标记为对象存储类型，则尝试取出
     if (storeType === 'oss' && !noOSS) {
+      if (isNil(ossKey)) {
+        throw new Error('Option `ossKey` is required using object storage');
+      }
+
+      if (typeof ossKey !== 'string') {
+        throw new Error('Option `ossKey` must be a string');
+      }
+
       const resultString = (await retryWrapper(() =>
-        storageClient.get(body as string)
+        storageClient.get(ossKey as string)
       )).content.toString();
 
-      storageClient.del(body as string).catch(console.error);
+      storageClient.del(ossKey as string).catch(console.error);
 
       // 从对象存储中取回数据需要再解析一次
       body = JSON.parse(resultString);
