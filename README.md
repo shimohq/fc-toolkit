@@ -1,6 +1,8 @@
-[![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
-
 # 阿里云函数计算工具集
+
+![Travis (.com)](https://img.shields.io/travis/com/shimohq/fc-toolkit)
+[![GitHub issues](https://img.shields.io/github/issues/shimohq/fc-toolkit)](https://github.com/shimohq/fc-toolkit/issues)
+[![GitHub license](https://img.shields.io/github/license/shimohq/fc-toolkit)](https://github.com/shimohq/fc-toolkit/blob/master/LICENSE)
 
 主要功能:
 
