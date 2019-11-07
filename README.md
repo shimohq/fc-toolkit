@@ -1,9 +1,12 @@
 # 阿里云函数计算工具集
 
 ![Travis (.com)](https://img.shields.io/travis/com/shimohq/fc-toolkit)
-![Coveralls github](https://img.shields.io/coveralls/github/shimohq/fc-toolkit)
+[![Coverage Github][coverage-image]][coverage-url]
 [![GitHub issues](https://img.shields.io/github/issues/shimohq/fc-toolkit)](https://github.com/shimohq/fc-toolkit/issues)
 [![GitHub license](https://img.shields.io/github/license/shimohq/fc-toolkit)](https://github.com/shimohq/fc-toolkit/blob/master/LICENSE)
+
+[coverage-image]: https://img.shields.io/coveralls/shimohq/fc-toolkit.svg
+[coverage-url]: https://coveralls.io/r/shimohq/fc-toolkit?branch=master
 
 主要功能:
 
@@ -21,10 +24,10 @@
 ```json
 {
   "oss": {
-    "region": "<oss region>",
+    "endpoint": "<oss endpoint>",
     "accessKeyId": "<Your accessKeyId>",
     "accessKeySecret": "<Your accessKeySecret>",
-    "bucket": "<Your bucket name>"
+    "bucket": "<Your bucket name>",
   },
   "fc": {
     "accountId": "<account id>",
@@ -62,7 +65,7 @@ Notes:
 // 业务代码
 const invoke = require('fc-toolkit').initInvoker({
   oss: {
-    region: "<oss region>",
+    endpoint: "<oss endpoint>",
     accessKeyId: "<Your accessKeyId>",
     accessKeySecret: "<Your accessKeySecret>",
     bucket: "<Your bucket name>"
