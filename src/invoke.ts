@@ -61,7 +61,7 @@ export function initInvoker(options: IInitInvokerOptions): initInvokerResult {
     let rawDataOrKey: string = body;
 
     // send with OSS key
-    if (sizeof(body) > ossThreshold && !options.noOSS) {
+    if (!options.noOSS && sizeof(body) > ossThreshold) {
       // storage key
       rawDataOrKey = uuid();
       type = 'oss';
