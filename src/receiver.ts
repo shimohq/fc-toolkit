@@ -7,7 +7,7 @@ import { sizeof, retryWrapper } from './common';
 import { MAX_RAW_PAYLOAD_SIZE } from './constants';
 import { getClientByType } from './storage';
 
-export type AliyunCallback = (error: any, response: any) => any;
+export type AliyunCallback = (error: any, response: IRepyPayload) => any;
 export type OSS_TYPE = 'oss' | 'aws';
 export interface IPayloadObject {
   [index: string]: any;
@@ -17,6 +17,10 @@ export interface IReceiveParsedPayload {
   ossType: string;
   body: IPayloadObject;
   ossKey?: string;
+}
+export interface IRepyPayload {
+  storeType: string;
+  body: string;
 }
 
 export function initReceiver(
@@ -98,7 +102,7 @@ export function initReceiver(
         sizeof(returnValue) > MAX_RAW_PAYLOAD_SIZE
       ) {
         const filePath = uuid();
-        const body = {
+        const body: IRepyPayload = {
           storeType: 'oss',
           body: filePath,
         };
