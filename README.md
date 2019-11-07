@@ -7,7 +7,7 @@
 [![GitHub license](https://img.shields.io/github/license/shimohq/fc-toolkit)](https://github.com/shimohq/fc-toolkit/blob/master/LICENSE)
 
 [travis-image]: https://img.shields.io/travis/com/shimohq/fc-toolkit
-[travis-url]: https://travis-ci.org/shimohq/fc-toolkit
+[travis-url]: https://travis-ci.com/shimohq/fc-toolkit
 [coverage-image]: https://img.shields.io/coveralls/shimohq/fc-toolkit.svg
 [coverage-url]: https://coveralls.io/r/shimohq/fc-toolkit?branch=master
 [david-image]: https://img.shields.io/david/shimohq/fc-toolkit.svg

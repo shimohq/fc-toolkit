@@ -1,7 +1,27 @@
 language: node_js
+
+services:
+  - docker
+
 node_js:
-  - 'node' # use latest stable nodejs version
+  - 10
+  - stable # use latest stable nodejs version
+
+env:
+  - AK=test_id
+  - SK=test_secret
+  - BUCKET=test_bucket
+
+before_script:
+  - docker --version
+  - docker pull minio/minio
+  - docker run -d -p 9000:9000 --name minio1 -e "MINIO_ACCESS_KEY=$AK" -e "MINIO_SECRET_KEY=$SK" -v /data:/data minio/minio server /data
+  - docker pull minio/mc
+  - docker run -it -d --entrypoint=/bin/sh --name minio_client --link minio1:minio1 minio/mc /bin/sh -c "mc config host add minio http://minio1:9000 $AK $SK --api S3v4 && mc mb minio/$BUCKET"
+  - docker ps -a
+
 script:
   - npm run coverage # jest test with coverage flag does coverage too
+
 after_script:
   - 'cat coverage/lcov.info | ./node_modules/.bin/coveralls' # sends the coverage report to coveralls
