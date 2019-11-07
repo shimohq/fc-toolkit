@@ -1,15 +1,22 @@
-const fs = require('fs');
 const path = require('path');
-const OSS = require('ali-oss');
 const uuid = require('uuid/v4');
+const isPlainObject = require('lodash.isplainobject');
+
 import { sizeof, retryWrapper } from './common';
+import { MAX_RAW_PAYLOAD_SIZE } from './constants';
+import { getClientByType } from './storage';
 
-const OSS_THRESHOLD = 3e6;
-
-type AliyunCallback = (error: any, response: any) => any;
+export type AliyunCallback = (error: any, response: any) => any;
+export type OSS_TYPE = 'oss' | 'aws'
+export interface IPayloadObject { [index: string]: any }
+export interface IReceiveParsedPayload {
+  storeType: string,
+  body: string | IPayloadObject,
+}
 
 export function initReceiver(
-  noOSS: boolean = false
+  noOSS: boolean = false,
+  ossType: OSS_TYPE = 'oss'
 ): {
   receive: (event: string) => Promise<any>;
   reply: (
@@ -17,24 +24,43 @@ export function initReceiver(
   ) => (returnValue: string, directReturn?: boolean) => Promise<void>;
 } {
   const cwd = process.cwd();
-  const config = JSON.parse(
-    fs.readFileSync(path.join(cwd, './.fc-config.json')).toString()
-  );
+  const config = require(path.join(cwd, './.fc-config.json'));
+  const storageOptions = config[ossType] || {};
+  const storageClient = getClientByType(ossType, storageOptions);
 
-  config.fc.region = config.fc.region + '-internal';
-  config.oss.region = config.oss.region + '-internal';
+  const receive = async (event: string | IReceiveParsedPayload): Promise<any> => {
+    let storeType: string;
+    let body: string | IPayloadObject;
 
-  const ossClient = new OSS(config.oss);
+    // 如果是字符串才进行 parse
+    if (typeof event === 'string') {
+      const eventParsed = JSON.parse(event);
+      storeType = eventParsed.storeType;
+      body = eventParsed.body;
+    } else if (isPlainObject(event)) {
+      // 如果外部已经解析，此处直接取值
+      storeType = event.storeType;
+      body = event.body;
+    } else {
+      throw new Error('Unsupported event data type, should be a plain object or a string');
+    }
 
-  const receive = async (event: string) => {
-    const { storeType, body } = JSON.parse(event);
-
+    // 如果是标记为对象存储类型，则尝试取出
     if (storeType === 'oss' && !noOSS) {
-      const bodyString = (await retryWrapper(() =>
-        ossClient.get(body)
+      const resultString = (await retryWrapper(() =>
+        storageClient.get(body as string)
       )).content.toString();
-      ossClient.delete(body).catch(console.error);
-      return bodyString;
+
+      storageClient.del(body as string).catch(console.error);
+
+      // 从对象存储中取回数据需要再解析一次
+      body = JSON.parse(resultString);
+    }
+
+    // 经过以上步骤后，发现还是 string ,尝试一次 parse
+    // 理论上应该只有 storeType 为 oss 时，才是 string
+    if (typeof body === 'string') {
+      body = JSON.parse(body);
     }
 
     return body;
@@ -45,18 +71,23 @@ export function initReceiver(
       if (typeof returnValue !== 'string') {
         throw new Error('return value must be string');
       }
-      if (sizeof(returnValue) > OSS_THRESHOLD && !noOSS && !directReturn) {
+
+      if (
+        !noOSS &&
+        !directReturn &&
+        sizeof(returnValue) > MAX_RAW_PAYLOAD_SIZE
+      ) {
         const filePath = uuid();
-        await retryWrapper(() =>
-          ossClient.put(filePath, Buffer.from(returnValue))
-        );
         const body = {
           storeType: 'oss',
           body: filePath,
         };
-        callback(null, body);
-        return;
+
+        await retryWrapper(() => storageClient.put(filePath, returnValue));
+
+        return callback(null, body);
       }
+
       callback(null, {
         storeType: 'direct',
         body: returnValue,

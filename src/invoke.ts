@@ -1,16 +1,11 @@
-const OSS = require('ali-oss');
 const FCClient = require('@alicloud/fc2');
 const uuid = require('uuid/v4');
 
 import { sizeof, retryWrapper } from './common';
+import { MAX_RAW_PAYLOAD_SIZE } from './constants';
+import { getClientByType } from './storage';
 
-export function initInvoker(options: {
-  oss: {
-    region: string;
-    accessKeyId: string;
-    accessKeySecret: string;
-    bucket: string;
-  };
+export interface IInitInvokerOptions {
   fc: {
     accountId: string | number;
     accessKeyID: string;
@@ -18,12 +13,39 @@ export function initInvoker(options: {
     region: string;
     timeout?: number;
   };
+  oss?: {
+    accessKeyId: string;
+    accessKeySecret: string;
+    bucket: string;
+    endpoint: string;
+  };
+  aws?: {
+    accessKeyId: string;
+    secretAccessKey: string;
+    bucket: string;
+    region?: string;
+    endpoint?: string;
+    s3ForcePathStyle?: boolean;
+  };
   ossThreshold?: number;
   noOSS?: boolean;
-}): (serviceName: string, functionName: string, body: any) => Promise<string> {
-  const ossClient = new OSS(options.oss);
+}
+
+export type initInvokerResult = (
+  serviceName: string,
+  functionName: string,
+  body: any
+) => Promise<string>;
+
+export function initInvoker(options: IInitInvokerOptions): initInvokerResult {
+  // 目前只有 2 种，默认使用 oss
+  const storageType = options.aws ? 'aws' : 'oss';
+  const storageClient = getClientByType(
+    storageType,
+    options.oss! || options.aws!
+  );
   const fcClient = new FCClient(options.fc.accountId, options.fc);
-  const ossThreshold = options.ossThreshold || 2e6;
+  const ossThreshold = options.ossThreshold || MAX_RAW_PAYLOAD_SIZE;
 
   return async (
     serviceName: string,
@@ -35,25 +57,24 @@ export function initInvoker(options: {
     }
 
     const fcBody = [serviceName, functionName];
+    let type: string = 'direct';
+    let rawDataOrKey: string = body;
 
-    // send via OSS
+    // send with OSS key
     if (sizeof(body) > ossThreshold && !options.noOSS) {
-      const filePath = uuid();
-      await retryWrapper(() => ossClient.put(filePath, Buffer.from(body)));
-      fcBody.push(
-        JSON.stringify({
-          storeType: 'oss',
-          body: filePath,
-        })
-      );
-    } else {
-      fcBody.push(
-        JSON.stringify({
-          storeType: 'direct',
-          body,
-        })
-      );
+      // storage key
+      rawDataOrKey = uuid();
+      type = 'oss';
+
+      await retryWrapper(() => storageClient.put(rawDataOrKey, body));
     }
+
+    fcBody.push(
+      JSON.stringify({
+        storeType: type,
+        body: rawDataOrKey,
+      })
+    );
 
     const res = await retryWrapper(async (bail: any) => {
       try {
@@ -87,9 +108,11 @@ export function initInvoker(options: {
 
     if (result.storeType === 'oss' && !options.noOSS) {
       const retBodyString = (await retryWrapper(() =>
-        ossClient.get(result.body)
+        storageClient.get(result.body)
       )).content.toString();
-      ossClient.delete(result.body).catch(console.error);
+
+      storageClient.del(result.body).catch(console.error);
+
       return retBodyString;
     }
 

@@ -31,7 +31,13 @@ const functionNames = version
   .split(',')
   .map(v => getFunctionName({ name, version: v }));
 
-const client = new FCClient(config.fc.accountId, config.fc);
+const client = new FCClient(config.fc.accountId, {
+  ...config.fc,
+  ...{
+    // 如果配置中包含内网，则移除内网后缀
+    region: config.fc.region.replace('-internal', ''),
+  },
+});
 
 function prepare() {
   if (!skipInstall) {
@@ -40,7 +46,9 @@ function prepare() {
   }
   console.log('compress file..');
   const filepath = `/tmp/${Math.random()}.zip`;
-  execSync(config.zip || `zip -qr ${filepath} ./ -x *.git*`, { stdio: 'inherit' });
+  execSync(config.zip || `zip -qr ${filepath} ./ -x *.git*`, {
+    stdio: 'inherit',
+  });
 
   console.log(
     `zip file size is ${filesize(fs.statSync(filepath).size)}, uploading zip..`

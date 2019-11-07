@@ -33,7 +33,7 @@
   "serviceName": "yourFcServiceName",
   "handler": "index.handler",
   "memorySize": 1024,
-  "runtime": "nodejs8",
+  "runtime": "nodejs10",
   "timeout": 300,
   "name": "yourFcFunctionNamePrefix",
   "version": "1.0.0,1.0.1",
