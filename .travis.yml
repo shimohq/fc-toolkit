@@ -8,9 +8,7 @@ node_js:
   - stable # use latest stable nodejs version
 
 env:
-  - AK=test_id
-  - SK=test_secret
-  - BUCKET=test_bucket
+  - AK=test_id SK=test_secret BUCKET=test_bucket
 
 before_script:
   - docker --version
