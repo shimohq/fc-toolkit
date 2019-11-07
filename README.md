@@ -2,11 +2,14 @@
 
 ![Travis (.com)](https://img.shields.io/travis/com/shimohq/fc-toolkit)
 [![Coverage Github][coverage-image]][coverage-url]
+[![David deps][david-image]][david-url]
 [![GitHub issues](https://img.shields.io/github/issues/shimohq/fc-toolkit)](https://github.com/shimohq/fc-toolkit/issues)
 [![GitHub license](https://img.shields.io/github/license/shimohq/fc-toolkit)](https://github.com/shimohq/fc-toolkit/blob/master/LICENSE)
 
 [coverage-image]: https://img.shields.io/coveralls/shimohq/fc-toolkit.svg
 [coverage-url]: https://coveralls.io/r/shimohq/fc-toolkit?branch=master
+[david-image]: https://img.shields.io/david/shimohq/fc-toolkit.svg
+[david-url]: https://david-dm.org/shimohq/fc-toolkit
 
 主要功能:
 
