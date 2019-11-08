@@ -46,10 +46,14 @@ export function initReceiver(
 
     // 如果是字符串才进行 parse
     if (typeof event === 'string') {
-      const eventParsed = JSON.parse(event);
-      storeType = eventParsed.storeType;
-      ossKey = eventParsed.ossKey;
-      body = eventParsed.body;
+      try {
+        const eventParsed = JSON.parse(event);
+        storeType = eventParsed.storeType;
+        ossKey = eventParsed.ossKey;
+        body = eventParsed.body;
+      } catch (err) {
+        throw new Error(`Parse event string error: ${err.message}`);
+      }
     } else if (isPlainObject(event)) {
       // 如果外部已经解析，此处直接取值
       storeType = event.storeType;
@@ -78,13 +82,21 @@ export function initReceiver(
       storageClient.del(ossKey as string).catch(console.error);
 
       // 从对象存储中取回数据需要再解析一次
-      body = JSON.parse(resultString);
+      try {
+        body = JSON.parse(resultString);
+      } catch (err) {
+        throw new Error(`Parse object content error: ${err.message}`);
+      }
     }
 
     // 经过以上步骤后，发现还是 string ,尝试一次 parse
     // 理论上应该只有 storeType 为 oss 时，才是 string
     if (typeof body === 'string') {
-      body = JSON.parse(body);
+      try {
+        body = JSON.parse(body);
+      } catch (err) {
+        throw new Error(`Try parse body error: ${err.message}`);
+      }
     }
 
     return body;
