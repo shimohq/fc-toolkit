@@ -28,18 +28,26 @@
 
 ```json
 {
-  "oss": {
-    "endpoint": "<oss endpoint>",
-    "accessKeyId": "<Your accessKeyId>",
-    "accessKeySecret": "<Your accessKeySecret>",
-    "bucket": "<Your bucket name>",
-  },
   "fc": {
     "accountId": "<account id>",
     "accessKeyID": "<access key id>",
     "accessKeySecret": "<access key secret>",
     "region": "cn-shanghai",
     "timeout": 50000
+  },
+  "oss": {
+    "endpoint": "<oss endpoint>",
+    "accessKeyId": "<Your accessKeyId>",
+    "accessKeySecret": "<Your accessKeySecret>",
+    "bucket": "<Your bucket name>",
+  },
+  "aws": {
+    "accessKeyId": "< your access key ID>",
+    "secretAccessKey": "<your secret access key>",
+    "bucket": "<your bucket>",
+    "region": "<cn-north-1>",
+    "endpoint": "<your endpoint>",
+    "s3ForcePathStyle": true
   },
   "serviceName": "yourFcServiceName",
   "handler": "index.handler",
@@ -67,13 +75,32 @@ Notes:
 ## 调用函数
 
 ```js
-// 业务代码
+// using oss
 const invoke = require('fc-toolkit').initInvoker({
   oss: {
     endpoint: "<oss endpoint>",
     accessKeyId: "<Your accessKeyId>",
     accessKeySecret: "<Your accessKeySecret>",
     bucket: "<Your bucket name>"
+  },
+  fc: {
+    accountId: "<account id>",
+    accessKeyID: "<access key id>",
+    accessKeySecret: "<access key secret>",
+    region: "cn-shanghai",
+    timeout: 50000
+  }
+})
+
+// or using minio
+const invoke = require('fc-toolkit').initInvoker({
+  aws: {
+    "accessKeyId": "< your access key ID>",
+    "secretAccessKey": "<your secret access key>",
+    "bucket": "<your bucket>",
+    "region": "<cn-north-1>",
+    "endpoint": "<your endpoint>",
+    "s3ForcePathStyle": true
   },
   fc: {
     accountId: "<account id>",
@@ -95,7 +122,10 @@ const result = await invoke(serviceName, functionName, body)
 ```js
 // 函数计算里执行的代码
 
-const { receive, reply } = require('fc-toolkit').initReveiver()
+const { receive, reply } = require('fc-toolkit').initReveiver(
+  false, // if disable oss, defaults to false
+  'aws'  // set 'aws' when using minio, defaults to 'oss'
+)
 
 async function handler (event, context, callback) {
   try {
