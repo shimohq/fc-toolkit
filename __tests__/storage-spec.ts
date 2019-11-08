@@ -34,5 +34,5 @@ describe('storage', () => {
     } catch (err) {
       expect(err.message).toContain('Unknown store type:');
     }
-  })
+  });
 });
