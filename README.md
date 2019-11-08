@@ -1,5 +1,6 @@
 # 阿里云函数计算工具集
 
+![npm](https://img.shields.io/npm/v/fc-toolkit)
 [![Travis (.com)][travis-image]][travis-url]
 [![Coverage Github][coverage-image]][coverage-url]
 [![David deps][david-image]][david-url]
