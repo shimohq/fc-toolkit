@@ -1,6 +1,6 @@
 const retry = require('async-retry');
 
-export function sizeof(str: string): number {
+export function sizeof(str: string | Buffer): number {
   return Buffer.byteLength(str, 'utf-8');
 }
 

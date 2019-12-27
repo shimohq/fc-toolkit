@@ -90,7 +90,7 @@ const invoke = require('fc-toolkit').initInvoker({
     accessKeySecret: "<access key secret>",
     region: "cn-shanghai",
     timeout: 50000
-  }
+  },
 })
 
 // or using minio
@@ -115,7 +115,6 @@ const invoke = require('fc-toolkit').initInvoker({
 // 由于经 OSS 中转会丢失格式，body 需要为字符串格式
 const result = await invoke(serviceName, functionName, body)
 ```
-
 如果发送的大小或者函数计算返回的结果超过了函数计算的大小限制，会自动使用 OSS 转发和收取；
 
 ## 处理任务
@@ -126,6 +125,7 @@ const result = await invoke(serviceName, functionName, body)
 const { receive, reply } = require('fc-toolkit').initReveiver(
   false, // if disable oss, defaults to false
   'aws'  // set 'aws' when using minio, defaults to 'oss'
+  ossThreshold: number // ossThreshold. 当响应超过此大小时, 使用oss. 默认2000000
 )
 
 async function handler (event, context, callback) {
@@ -138,6 +138,26 @@ async function handler (event, context, callback) {
     callback(e)
   }
 }
+```
+
+## 使用Buffer
+
+### initInvoker
+
+```js
+// using oss
+const invoke = require('fc-toolkit').bufferSupport.initInvoker({
+  oss: {
+    ...
+  },
+  fc: {
+    ...
+  },
+  ossThreshold: number; // 当请求body大于ossThreshold时使用oss
+  bufferOssResp: boolean; // 当使用oss时, 响应将返回Buffer而不是string
+})
+
+const result: string | Buffer = await invoke(serviceName, functionName, body)
 ```
 
 # LICENSE
