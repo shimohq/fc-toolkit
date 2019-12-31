@@ -1,5 +1,6 @@
 const FCClient = require('@alicloud/fc2');
 const uuid = require('uuid/v4');
+const omitBy = require('lodash.omitby');
 
 import { sizeof, retryWrapper } from '../common';
 import { MAX_RAW_PAYLOAD_SIZE } from '../constants';
@@ -28,14 +29,14 @@ export interface IInitInvokerOptions {
     s3ForcePathStyle?: boolean;
   };
   ossThreshold?: number;
-  bufferOssResp?: boolean;
   noOSS?: boolean;
 }
 
 export type initInvokerResult = (
   serviceName: string,
   functionName: string,
-  body: any
+  body: any,
+  headers?: any
 ) => Promise<string | Buffer>;
 
 export function initInvoker(options: IInitInvokerOptions): initInvokerResult {
@@ -51,7 +52,8 @@ export function initInvoker(options: IInitInvokerOptions): initInvokerResult {
   return async (
     serviceName: string,
     functionName: string,
-    body: string | Buffer
+    body: string | Buffer,
+    headers: any = {}
   ): Promise<string | Buffer> => {
     const isBuffer = Buffer.isBuffer(body);
     if (typeof body !== 'string' && !isBuffer) {
@@ -59,23 +61,34 @@ export function initInvoker(options: IInitInvokerOptions): initInvokerResult {
     }
 
     let type: string = 'direct';
-    let rawDataOrKey: string;
+    let rawData: string | undefined;
+    let ossKey: string | undefined;
 
     // send with OSS key
     if (!options.noOSS && sizeof(body) > ossThreshold) {
       // storage key
-      rawDataOrKey = uuid();
+      ossKey = uuid() as string;
       type = 'oss';
 
-      await retryWrapper(() => storageClient.put(rawDataOrKey, body));
+      await retryWrapper(() => storageClient.put(ossKey!, body));
     } else {
-      rawDataOrKey = body.toString();
+      rawData = isBuffer
+        ? (body as Buffer).toString('base64')
+        : (body as string);
     }
 
-    const params = JSON.stringify({
-      storeType: type,
-      body: rawDataOrKey,
-    });
+    const params = JSON.stringify(
+      omitBy(
+        {
+          storeType: type,
+          ossKey,
+          body: rawData,
+          isBuffer,
+          headers,
+        },
+        (v: any) => v === undefined
+      )
+    );
 
     const res = await retryWrapper(async (bail: any) => {
       try {
@@ -110,16 +123,15 @@ export function initInvoker(options: IInitInvokerOptions): initInvokerResult {
     });
 
     const result = JSON.parse(res);
-
     if (result.storeType === 'oss' && !options.noOSS) {
       const retBody: Buffer = (await retryWrapper(() =>
-        storageClient.get(result.body)
+        storageClient.getAsBuffer(result.body)
       )).content;
       storageClient.del(result.body).catch(console.error);
 
-      return options.bufferOssResp ? retBody : retBody.toString();
+      return result.isBuffer ? retBody : retBody.toString();
     }
 
-    return result.body;
+    return result.isBuffer ? Buffer.from(result.body, 'base64') : result.body;
   };
 }

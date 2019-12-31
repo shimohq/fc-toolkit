@@ -2,7 +2,9 @@ import * as bufferSupport from './bufferSupport/receiver';
 
 export type AliyunCallback = bufferSupport.AliyunCallback;
 export type OSS_TYPE = bufferSupport.OSS_TYPE;
-export type IPayloadObject = bufferSupport.IPayloadObject;
+export interface IPayloadObject {
+  [index: string]: any;
+}
 
 export type IReceiveParsedPayload = bufferSupport.IReceiveParsedPayload;
 export type IReplyPayload = bufferSupport.IReplyPayload;
@@ -20,11 +22,7 @@ export function initReceiver(
 
   return {
     receive: (event: string | IReceiveParsedPayload) =>
-      receive(event).then(
-        res => (Buffer.isBuffer(res) ? JSON.parse(res.toString()) : res)
-      ),
+      receive(event).then(res => JSON.parse(res.body.toString())),
     reply,
   };
-
-  return { receive, reply };
 }
