@@ -16,7 +16,6 @@ export type initInvokerResult = (
 export function initInvoker(options: IInitInvokerOptions): initInvokerResult {
   const invoke = bufferSupport.initInvoker({
     ...options,
-    bufferOssResp: false,
   });
   return (serviceName: string, functionName: string, body: any) =>
     invoke(serviceName, functionName, body).then(res => res.toString());

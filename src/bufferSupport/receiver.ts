@@ -2,6 +2,7 @@ const path = require('path');
 const uuid = require('uuid/v4');
 const isPlainObject = require('lodash.isplainobject');
 const isNil = require('lodash.isnil');
+const omitBy = require('lodash.omitby');
 
 import { sizeof, retryWrapper } from '../common';
 import { MAX_RAW_PAYLOAD_SIZE } from '../constants';
@@ -9,17 +10,18 @@ import { getClientByType } from '../storage';
 
 export type AliyunCallback = (error: any, response: IReplyPayload) => any;
 export type OSS_TYPE = 'oss' | 'aws';
-export interface IPayloadObject {
-  [index: string]: any;
-}
+
 export interface IReceiveParsedPayload {
   storeType: string;
   ossType: string;
-  body: IPayloadObject;
+  body: string;
   ossKey?: string;
+  headers?: any;
+  isBuffer?: boolean;
 }
 export interface IReplyPayload {
   storeType: string;
+  isBuffer?: boolean;
   body: string;
 }
 
@@ -30,7 +32,7 @@ export function initReceiver(
 ): {
   receive: (
     event: string | IReceiveParsedPayload
-  ) => Promise<IPayloadObject | Buffer>;
+  ) => Promise<{ headers?: any; body: string | Buffer }>;
   reply: (
     callback: AliyunCallback
   ) => (returnValue: string | Buffer, directReturn?: boolean) => Promise<void>;
@@ -41,19 +43,23 @@ export function initReceiver(
   const storageClient = getClientByType(ossType, storageOptions);
 
   const receive = async (
-    event: string | IReceiveParsedPayload
-  ): Promise<IPayloadObject | Buffer> => {
+    event: Buffer | string | IReceiveParsedPayload
+  ): Promise<{ headers?: any; body: string | Buffer }> => {
     let storeType: string;
     let ossKey: string | undefined;
-    let body: IPayloadObject;
+    let body: string;
+    let headers: any;
+    let isBuffer: boolean;
 
     // 如果是字符串才进行 parse
-    if (typeof event === 'string') {
+    if (typeof event === 'string' || Buffer.isBuffer(event)) {
       try {
-        const eventParsed = JSON.parse(event);
+        const eventParsed = JSON.parse(event.toString());
         storeType = eventParsed.storeType;
         ossKey = eventParsed.ossKey;
         body = eventParsed.body;
+        headers = eventParsed.headers;
+        isBuffer = eventParsed.isBuffer;
       } catch (err) {
         throw new Error(`Parse event string error: ${err.message}`);
       }
@@ -62,6 +68,8 @@ export function initReceiver(
       storeType = event.storeType;
       ossKey = event.ossKey;
       body = event.body;
+      headers = event.headers;
+      isBuffer = event.isBuffer || false;
     } else {
       throw new Error(
         'Unsupported event data type, should be a plain object or a string'
@@ -79,32 +87,21 @@ export function initReceiver(
       }
 
       const content: Buffer = (await retryWrapper(() =>
-        storageClient.get(ossKey as string)
+        storageClient.getAsBuffer(ossKey as string)
       )).content;
 
       storageClient.del(ossKey as string).catch(console.error);
 
-      return content;
-
-      // 从对象存储中取回数据需要再解析一次
-      // try {
-      //   body = JSON.parse(resultString);
-      // } catch (err) {
-      //   throw new Error(`Parse object content error: ${err.message}`);
-      // }
+      return omitBy(
+        { headers, body: isBuffer ? content : content.toString() },
+        (v: any) => v === undefined
+      );
     }
 
-    // 经过以上步骤后，发现还是 string ,尝试一次 parse
-    // 理论上应该只有 storeType 为 oss 时，才是 string
-    if (typeof body === 'string') {
-      try {
-        body = JSON.parse(body);
-      } catch (err) {
-        throw new Error(`Try parse body error: ${err.message}`);
-      }
-    }
-
-    return body;
+    return omitBy(
+      { headers, body: isBuffer ? Buffer.from(body, 'base64') : body },
+      (v: any) => v === undefined
+    );
   };
 
   const reply = (callback: AliyunCallback) => {
@@ -135,7 +132,10 @@ export function initReceiver(
 
       callback(null, {
         storeType: 'direct',
-        body: returnValue.toString(),
+        isBuffer,
+        body: isBuffer
+          ? (returnValue as Buffer).toString('base64')
+          : (returnValue as string),
       });
     };
   };

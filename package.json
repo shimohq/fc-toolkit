@@ -1,6 +1,6 @@
 {
   "name": "fc-toolkit",
-  "version": "1.1.0-alpha.1",
+  "version": "1.1.0-alpha.2",
   "description": "fc-toolkit",
   "license": "MIT",
   "repository": "",
@@ -39,10 +39,12 @@
     "filesize": "^6.0.0",
     "lodash.isnil": "^4.0.0",
     "lodash.isplainobject": "^4.0.6",
+    "lodash.omitby": "^4.6.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@types/jest": "^22.0.1",
+    "@types/lodash.omitby": "^4.6.6",
     "@types/node": "^8.0.0",
     "coveralls": "^2.0.0",
     "jest": "^22.0.4",
