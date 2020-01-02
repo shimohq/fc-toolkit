@@ -102,6 +102,49 @@ describe('receiver test cases', () => {
     })
   })
 
+  describe('should reply works normally', () => {
+    it('when return value is string', done => {
+      const { reply } = Receiver.initReceiver()
+      const cb = (err, data) => {
+        expect(err).toBeFalsy()
+        expect(data).toEqual({
+          storeType: 'direct',
+          isBuffer: false,
+          body: 'foooo'
+        })
+        done()
+      }
+      reply(cb)('foooo')
+    })
+  
+    it('when return value is Buffer', done => {
+      const { reply } = Receiver.initReceiver()
+      const cb = (err, data) => {
+        expect(err).toBeFalsy()
+        expect(data).toEqual({
+          storeType: 'direct',
+          isBuffer: true,
+          body: Buffer.from('foooo').toString('base64')
+        })
+        done()
+      }
+      reply(cb)(Buffer.from('foooo'))
+    })
+
+    it('when return value is oss key', done => {
+      const { reply } = Receiver.initReceiver(false, 'oss', 10)
+      const cb = (err, data) => {
+        expect(err).toBeFalsy()
+        expect(data.storeType).toBe('oss')
+        fakeStorage.getAsBuffer(data.body).then(resp => {
+          expect(resp.content.toString()).toBe('fooooooooooooo')
+          done()
+        })
+      }
+      reply(cb)('fooooooooooooo')
+    })
+  })
+
   afterAll(() => {
     sandbox.reset();
     const cwd = process.cwd();
