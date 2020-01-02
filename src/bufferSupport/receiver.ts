@@ -122,6 +122,7 @@ export function initReceiver(
         const filePath = uuid();
         const body: IReplyPayload = {
           storeType: 'oss',
+          isBuffer,
           body: filePath,
         };
 
