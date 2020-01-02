@@ -31,7 +31,7 @@ export function initReceiver(
   ossThreshold: number = 0
 ): {
   receive: (
-    event: string | IReceiveParsedPayload
+    event: Buffer | string | IReceiveParsedPayload
   ) => Promise<{ headers?: any; body: string | Buffer }>;
   reply: (
     callback: AliyunCallback
