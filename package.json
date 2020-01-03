@@ -50,6 +50,7 @@
     "jest": "^22.0.4",
     "prettier": "^1.5.2",
     "rimraf": "^2.0.0",
+    "sinon": "^8.0.2",
     "ts-jest": "^22.0.1",
     "ts-node": "^3.2.0",
     "tslint": "^5.0.0",
@@ -64,6 +65,9 @@
       ".(ts)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|js)$",
+    "testPathIgnorePatterns" : [
+      "<rootDir>/__tests__/mock/" 
+    ],
     "moduleFileExtensions": [
       "ts",
       "js"
