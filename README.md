@@ -154,7 +154,6 @@ const invoke = require('fc-toolkit').bufferSupport.initInvoker({
     ...
   },
   ossThreshold: number; // 当请求body大于ossThreshold时使用oss
-  bufferOssResp: boolean; // 当使用oss时, 响应将返回Buffer而不是string
 })
 
 const result: string | Buffer = await invoke(serviceName, functionName, body)
