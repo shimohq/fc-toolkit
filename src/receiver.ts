@@ -14,9 +14,7 @@ export function initReceiver(
   ossType: OSS_TYPE = 'oss'
 ): {
   receive: (event: string) => Promise<IPayloadObject>;
-  reply: (
-    callback: AliyunCallback
-  ) => (returnValue: string, directReturn?: boolean) => Promise<void>;
+  reply: bufferSupport.replyFunc;
 } {
   const { receive, reply } = bufferSupport.initReceiver(noOSS, ossType, 0);
 

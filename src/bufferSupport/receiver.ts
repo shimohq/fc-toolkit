@@ -10,6 +10,9 @@ import { getClientByType } from '../storage';
 
 export type AliyunCallback = (error: any, response: IReplyPayload) => any;
 export type OSS_TYPE = 'oss' | 'aws';
+export type replyFunc = (
+  callback: AliyunCallback
+) => (returnValue: string | Buffer, directReturn?: boolean, meta?: any) => Promise<void>;
 
 export interface IReceiveParsedPayload {
   storeType: string;
@@ -34,9 +37,7 @@ export function initReceiver(
   receive: (
     event: Buffer | string | IReceiveParsedPayload
   ) => Promise<{ headers?: any; body: string | Buffer }>;
-  reply: (
-    callback: AliyunCallback
-  ) => (returnValue: string | Buffer, directReturn?: boolean, meta?: any) => Promise<void>;
+  reply: replyFunc;
 } {
   const cwd = process.cwd();
   const config = require(path.join(cwd, './.fc-config.json'));
