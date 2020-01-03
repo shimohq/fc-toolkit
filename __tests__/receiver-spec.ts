@@ -146,9 +146,10 @@ describe('receiver test cases', () => {
 
     it('when meta is set', done => {
       const { reply } = Receiver.initReceiver()
-      const meta = new Map<string, any>();
       const body = 'foooo'
-      meta.set('length', body.length)
+      const meta = {
+        length: body.length
+      }
       const cb = (err, data) => {
         expect(err).toBeFalsy()
         expect(data).toEqual({

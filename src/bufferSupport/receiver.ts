@@ -23,7 +23,7 @@ export interface IReplyPayload {
   storeType: string;
   isBuffer?: boolean;
   body: string;
-  meta?: Map<string, any>;
+  meta?: any;
 }
 
 export function initReceiver(
@@ -36,7 +36,7 @@ export function initReceiver(
   ) => Promise<{ headers?: any; body: string | Buffer }>;
   reply: (
     callback: AliyunCallback
-  ) => (returnValue: string | Buffer, directReturn?: boolean, meta?: Map<string, any>) => Promise<void>;
+  ) => (returnValue: string | Buffer, directReturn?: boolean, meta?: any) => Promise<void>;
 } {
   const cwd = process.cwd();
   const config = require(path.join(cwd, './.fc-config.json'));
@@ -109,7 +109,7 @@ export function initReceiver(
     return async (
       returnValue: string | Buffer,
       directReturn: boolean = false,
-      meta?: Map<string, any>
+      meta?: any
     ) => {
       const isBuffer = Buffer.isBuffer(returnValue);
       if (typeof returnValue !== 'string' && !isBuffer) {
