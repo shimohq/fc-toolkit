@@ -23,6 +23,7 @@ export interface IReplyPayload {
   storeType: string;
   isBuffer?: boolean;
   body: string;
+  meta?: Map<string, any>;
 }
 
 export function initReceiver(
@@ -35,7 +36,7 @@ export function initReceiver(
   ) => Promise<{ headers?: any; body: string | Buffer }>;
   reply: (
     callback: AliyunCallback
-  ) => (returnValue: string | Buffer, directReturn?: boolean) => Promise<void>;
+  ) => (returnValue: string | Buffer, directReturn?: boolean, meta?: Map<string, any>) => Promise<void>;
 } {
   const cwd = process.cwd();
   const config = require(path.join(cwd, './.fc-config.json'));
@@ -107,7 +108,8 @@ export function initReceiver(
   const reply = (callback: AliyunCallback) => {
     return async (
       returnValue: string | Buffer,
-      directReturn: boolean = false
+      directReturn: boolean = false,
+      meta?: Map<string, any>
     ) => {
       const isBuffer = Buffer.isBuffer(returnValue);
       if (typeof returnValue !== 'string' && !isBuffer) {
@@ -124,6 +126,7 @@ export function initReceiver(
           storeType: 'oss',
           isBuffer,
           body: filePath,
+          meta,
         };
 
         await retryWrapper(() => storageClient.put(filePath, returnValue));
@@ -137,6 +140,7 @@ export function initReceiver(
         body: isBuffer
           ? (returnValue as Buffer).toString('base64')
           : (returnValue as string),
+        meta,
       });
     };
   };
