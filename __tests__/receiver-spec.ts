@@ -143,6 +143,25 @@ describe('receiver test cases', () => {
       }
       reply(cb)('fooooooooooooo')
     })
+
+    it('when meta is set', done => {
+      const { reply } = Receiver.initReceiver()
+      const body = 'foooo'
+      const meta = {
+        length: body.length
+      }
+      const cb = (err, data) => {
+        expect(err).toBeFalsy()
+        expect(data).toEqual({
+          storeType: 'direct',
+          isBuffer: false,
+          body,
+          meta,
+        })
+        done()
+      }
+      reply(cb)(body, false, meta)
+    })
   })
 
   afterAll(() => {
