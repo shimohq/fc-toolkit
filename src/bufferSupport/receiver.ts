@@ -12,7 +12,11 @@ export type AliyunCallback = (error: any, response: IReplyPayload) => any;
 export type OSS_TYPE = 'oss' | 'aws';
 export type replyFunc = (
   callback: AliyunCallback
-) => (returnValue: string | Buffer, directReturn?: boolean, meta?: any) => Promise<void>;
+) => (
+  returnValue: string | Buffer,
+  directReturn?: boolean,
+  meta?: any
+) => Promise<void>;
 
 export interface IReceiveParsedPayload {
   storeType: string;
