@@ -40,7 +40,7 @@ export function initReceiver(
 ): {
   receive: (
     event: Buffer | string | IReceiveParsedPayload
-  ) => Promise<{ headers?: any; body: string | Buffer }>;
+  ) => Promise<{ headers?: any; body: any; storeType?: string }>;
   reply: replyFunc;
 } {
   const cwd = process.cwd();
@@ -50,10 +50,10 @@ export function initReceiver(
 
   const receive = async (
     event: Buffer | string | IReceiveParsedPayload
-  ): Promise<{ headers?: any; body: string | Buffer }> => {
+  ): Promise<{ headers?: any; body: any; storeType?: string }> => {
     let storeType: string;
     let ossKey: string | undefined;
-    let body: string;
+    let body: any;
     let headers: any;
     let isBuffer: boolean;
 
@@ -99,7 +99,7 @@ export function initReceiver(
       storageClient.del(ossKey as string).catch(console.error);
 
       return omitBy(
-        { headers, body: isBuffer ? content : content.toString() },
+        { headers, body: isBuffer ? content : content.toString(), storeType },
         (v: any) => v === undefined
       );
     }
