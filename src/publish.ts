@@ -66,7 +66,14 @@ async function publishToFc(filepath: string, functionName: string) {
     code: {
       zipFile: fs.readFileSync(filepath, 'base64'),
     },
-    ...pick(config, 'handler', 'memorySize', 'runtime', 'timeout'),
+    ...pick(
+      config,
+      'handler',
+      'memorySize',
+      'runtime',
+      'timeout',
+      'EnvironmentVariables'
+    ),
   });
 
   console.log(`create function ${serviceName}/${functionName} successfully!`);

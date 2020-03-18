@@ -44,8 +44,18 @@ export function initReceiver(
   reply: replyFunc;
 } {
   const cwd = process.cwd();
-  const config = require(path.join(cwd, './.fc-config.json'));
-  const storageOptions = config[ossType] || {};
+  const fcConfig = require(path.join(cwd, './.fc-config.json'));
+  let storageOptions = fcConfig[ossType] || {};
+
+  if (ossType === 'oss' && process.env['OSS_ID']) {
+    storageOptions = {
+      accessKeyId: process.env['OSS_ID'],
+      accessKeySecret: process.env['OSS_SECRET'],
+      bucket: process.env['OSS_BUCKET'],
+      endpoint: process.env['OSS_ENDPOINT'],
+    };
+  }
+
   const storageClient = getClientByType(ossType, storageOptions);
 
   const receive = async (

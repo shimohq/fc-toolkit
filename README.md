@@ -36,11 +36,11 @@
     "region": "cn-shanghai",
     "timeout": 50000
   },
-  "oss": {
-    "endpoint": "<oss endpoint>",
-    "accessKeyId": "<Your accessKeyId>",
-    "accessKeySecret": "<Your accessKeySecret>",
-    "bucket": "<Your bucket name>",
+  "EnvironmentVariables": {
+    "OSS_ID": "<Your accessKeyId>",
+    "OSS_SECRET": "<Your accessKeySecret>",
+    "OSS_BUCKET": "<Your bucket name>",
+    "OSS_ENDPOINT": "<oss endpoint>m"
   },
   "aws": {
     "accessKeyId": "< your access key ID>",
