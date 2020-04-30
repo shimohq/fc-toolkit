@@ -40,7 +40,8 @@
     "lodash.isnil": "^4.0.0",
     "lodash.isplainobject": "^4.0.6",
     "lodash.omitby": "^4.6.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "yn": "^4.0.0"
   },
   "devDependencies": {
     "@types/jest": "^22.0.1",

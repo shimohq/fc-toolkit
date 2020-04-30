@@ -40,7 +40,13 @@
     "OSS_ID": "<Your accessKeyId>",
     "OSS_SECRET": "<Your accessKeySecret>",
     "OSS_BUCKET": "<Your bucket name>",
-    "OSS_ENDPOINT": "<oss endpoint>m"
+    "OSS_ENDPOINT": "<oss endpoint>",
+  },
+  "oss": {
+    "endpoint": "<oss endpoint>",
+    "accessKeyId": "<Your accessKeyId>",
+    "accessKeySecret": "<Your accessKeySecret>",
+    "bucket": "<Your bucket name>"
   },
   "aws": {
     "accessKeyId": "< your access key ID>",
