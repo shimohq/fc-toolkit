@@ -7,6 +7,8 @@ const omitBy = require('lodash.omitby');
 import { sizeof, retryWrapper } from '../common';
 import { MAX_RAW_PAYLOAD_SIZE } from '../constants';
 import { getClientByType } from '../storage';
+import { StorageEngine } from '../types';
+import { loadConfigWithEnvs } from '../config';
 
 export type AliyunCallback = (error: any, response: IReplyPayload) => any;
 export type OSS_TYPE = 'oss' | 'aws';
@@ -35,7 +37,7 @@ export interface IReplyPayload {
 
 export function initReceiver(
   noOSS: boolean = false,
-  ossType: OSS_TYPE = 'oss',
+  ossType: StorageEngine = StorageEngine.ALIYUN_OSS,
   ossThreshold: number = 0
 ): {
   receive: (
@@ -43,19 +45,8 @@ export function initReceiver(
   ) => Promise<{ headers?: any; body: any; storeType?: string }>;
   reply: replyFunc;
 } {
-  const cwd = process.cwd();
-  const fcConfig = require(path.join(cwd, './.fc-config.json'));
-  let storageOptions = fcConfig[ossType] || {};
-
-  if (ossType === 'oss' && process.env['OSS_ID']) {
-    storageOptions = {
-      accessKeyId: process.env['OSS_ID'],
-      accessKeySecret: process.env['OSS_SECRET'],
-      bucket: process.env['OSS_BUCKET'],
-      endpoint: process.env['OSS_ENDPOINT'],
-    };
-  }
-
+  const fcConfig = loadConfigWithEnvs();
+  const storageOptions = fcConfig[ossType] || ({} as any);
   const storageClient = getClientByType(ossType, storageOptions);
 
   const receive = async (
