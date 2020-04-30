@@ -1,14 +1,13 @@
 import * as bufferSupport from './bufferSupport/receiver';
+import { StorageEngine } from './types';
 
 export type AliyunCallback = bufferSupport.AliyunCallback;
-export type OSS_TYPE = bufferSupport.OSS_TYPE;
-
 export type IReceiveParsedPayload = bufferSupport.IReceiveParsedPayload;
 export type IReplyPayload = bufferSupport.IReplyPayload;
 
 export function initReceiver(
   noOSS: boolean = false,
-  ossType: OSS_TYPE = 'oss'
+  ossType: StorageEngine = StorageEngine.ALIYUN_OSS
 ): {
   receive: (event: string | IReceiveParsedPayload) => Promise<any>;
   reply: bufferSupport.replyFunc;
