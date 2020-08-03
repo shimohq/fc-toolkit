@@ -45,7 +45,7 @@ export function initReceiver(
   ) => Promise<{ headers?: any; body: any; storeType?: string }>;
   reply: replyFunc;
 } {
-  const fcConfig = loadConfigWithEnvs();
+  const fcConfig = loadConfigWithEnvs(ossType);
   const storageOptions = fcConfig[ossType] || ({} as any);
   const storageClient = getClientByType(ossType, storageOptions);
 
