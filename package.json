@@ -33,7 +33,7 @@
     "watch:test": "jest --watch"
   },
   "dependencies": {
-    "@alicloud/fc2": "^2.0.4",
+    "@alicloud/fc2": "^2.2.2",
     "async-retry": "^1.2.3",
     "awos-js": "^1.0.4",
     "filesize": "^6.0.0",
