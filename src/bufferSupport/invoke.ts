@@ -128,7 +128,7 @@ export function initInvoker(options: IInitInvokerOptions): initInvokerResult {
       }
     });
 
-    const result = JSON.parse(res);
+    const result = typeof res === 'string' ? JSON.parse(res) : res;
     if (result.storeType === 'oss' && !options.noOSS) {
       const retBody: Buffer = (await retryWrapper(() =>
         storageClient.getAsBuffer(result.body)
