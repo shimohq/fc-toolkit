@@ -1,6 +1,7 @@
 const FCClient = require('@alicloud/fc2');
 const uuid = require('uuid/v4');
 const omitBy = require('lodash.omitby');
+const isNil = require('lodash.isnil');
 
 import { sizeof, retryWrapper } from '../common';
 import { MAX_RAW_PAYLOAD_SIZE } from '../constants';
@@ -98,7 +99,12 @@ export function initInvoker(options: IInitInvokerOptions): initInvokerResult {
           params
         );
 
-        if (typeof data === 'object') {
+        if (
+          typeof data === 'object' &&
+          !isNil(data.errorMessage) &&
+          !isNil(data.errorType) &&
+          !isNil(data.stackTrace)
+        ) {
           const error = new Error(data.errorMessage) as any;
           error.errorType = data.errorType;
           error.stackTrace = data.stackTrace;
