@@ -35,7 +35,7 @@
   "dependencies": {
     "@alicloud/fc2": "^2.2.2",
     "async-retry": "^1.2.3",
-    "awos-js": "^1.0.4",
+    "awos-js": "^2.0.5",
     "filesize": "^6.0.0",
     "lodash.isnil": "^4.0.0",
     "lodash.isplainobject": "^4.0.6",
@@ -44,15 +44,15 @@
     "yn": "^4.0.0"
   },
   "devDependencies": {
-    "@types/jest": "^22.0.1",
+    "@types/jest": "^26.0.23",
     "@types/lodash.omitby": "^4.6.6",
     "@types/node": "^13.13.4",
     "coveralls": "^2.0.0",
-    "jest": "^22.0.4",
+    "jest": "^26.6.3",
     "prettier": "^1.5.2",
     "rimraf": "^2.0.0",
     "sinon": "^8.0.2",
-    "ts-jest": "^22.0.1",
+    "ts-jest": "^26.5.6",
     "ts-node": "^3.2.0",
     "tslint": "^5.0.0",
     "tslint-config-prettier": "^1.1.0",
@@ -63,15 +63,15 @@
   },
   "jest": {
     "transform": {
-      ".(ts)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      "^.+\\.(t|j)s$": "ts-jest"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|js)$",
     "testPathIgnorePatterns": [
       "<rootDir>/__tests__/mock/"
     ],
     "moduleFileExtensions": [
-      "ts",
-      "js"
+      "js",
+      "ts"
     ],
     "testEnvironment": "node"
   },
