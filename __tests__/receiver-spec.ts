@@ -75,14 +75,17 @@ describe('receiver test cases', () => {
       });
 
       describe('when storeType is oss', () => {
+        let testKey: string;
+        let testContent: string;
+
         beforeEach(async () => {
-          this.key = uuid.v4();
-          this.content = 'aaa';
-          await fakeStorage.put(this.key, this.content);
+          testKey = uuid.v4();
+          testContent = 'aaa';
+          await fakeStorage.put(testKey, testContent);
         });
 
         afterEach(async () => {
-          const data = await fakeStorage.getAsBuffer(this.key);
+          const data = await fakeStorage.getAsBuffer(testKey);
           expect(data).toBeFalsy();
         });
 
@@ -92,9 +95,9 @@ describe('receiver test cases', () => {
             body: '',
             ossType: 'oss',
             storeType: 'oss',
-            ossKey: this.key,
+            ossKey: testKey,
           });
-          expect(resp.body).toBe(this.content);
+          expect(resp.body).toBe(testContent);
         });
 
         it('should the type of resp.body be Buffer, when event.isBuffer is true', async () => {
@@ -103,11 +106,11 @@ describe('receiver test cases', () => {
             body: '',
             ossType: 'oss',
             storeType: 'oss',
-            ossKey: this.key,
+            ossKey: testKey,
             isBuffer: true,
           });
           expect(Buffer.isBuffer(resp.body)).toBeTruthy();
-          expect(resp.body.toString()).toBe(this.content);
+          expect(resp.body.toString()).toBe(testContent);
         });
       });
     });
@@ -138,14 +141,17 @@ describe('receiver test cases', () => {
       });
 
       describe('when storeType is oss', () => {
+        let testKey: string;
+        let testContent: string;
+
         beforeEach(async () => {
-          this.key = uuid.v4();
-          this.content = JSON.stringify(testBody);
-          await fakeStorage.put(this.key, this.content);
+          testKey = uuid.v4();
+          testContent = JSON.stringify(testBody);
+          await fakeStorage.put(testKey, testContent);
         });
 
         afterEach(async () => {
-          const data = await fakeStorage.getAsBuffer(this.key);
+          const data = await fakeStorage.getAsBuffer(testKey);
           expect(data).toBeFalsy();
         });
 
@@ -155,7 +161,7 @@ describe('receiver test cases', () => {
             body: '',
             ossType: 'oss',
             storeType: 'oss',
-            ossKey: this.key,
+            ossKey: testKey,
           });
           expect(resp).toEqual(testBody);
         });
@@ -193,11 +199,11 @@ describe('receiver test cases', () => {
     });
 
     it('when return value is oss key', done => {
-      const { reply } = BufferReceiver.initReceiver(false, 'oss', 10);
+      const { reply } = BufferReceiver.initReceiver(false, 'oss' as any, 10);
       const cb = (err, data) => {
         expect(err).toBeFalsy();
         expect(data.storeType).toBe('oss');
-        fakeStorage.getAsBuffer(data.body).then(resp => {
+        fakeStorage.getAsBuffer(data.body).then((resp: any) => {
           expect(resp.content.toString()).toBe('fooooooooooooo');
           done();
         });

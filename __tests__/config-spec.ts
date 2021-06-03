@@ -29,7 +29,7 @@ describe('receiver test cases', () => {
 
   describe('load config', () => {
     it('should load config ok', async () => {
-      const config = loadConfig();
+      const config = loadConfig() as any;
       expect(config.aws.accessKeyId).toEqual('your aws id');
       expect(config.aws.secretAccessKey).toEqual('your aws secret');
       expect(config.aws.region).toEqual('cn-north-1');

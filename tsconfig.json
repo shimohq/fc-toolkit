@@ -8,6 +8,8 @@
     ],
     "target": "es2017",
     "strict": true,
+    "esModuleInterop": true,
+    "noImplicitAny": false,
     "outDir": "./lib",
     "preserveConstEnums": true,
     "removeComments": true,
