@@ -34,7 +34,8 @@ export function loadConfigWithEnvs(
     fcConfigWithEnvs.aws!.endpoint =
       process.env.AWS_S3_ENDPOINT || fcConfigWithEnvs.aws!.endpoint;
     fcConfigWithEnvs.aws!.signatureVersion =
-      process.env.AWS_S3_SIGNATURE_VERSION || fcConfigWithEnvs.aws!.signatureVersion;
+      process.env.AWS_S3_SIGNATURE_VERSION ||
+      fcConfigWithEnvs.aws!.signatureVersion;
     // 如果需要使用官方 S3，在环境变量中设为 false
     fcConfigWithEnvs.aws!.s3ForcePathStyle = process.env.AWS_S3_FORCE_PATH_STYLE
       ? yn(process.env.AWS_S3_FORCE_PATH_STYLE)
