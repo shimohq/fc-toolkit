@@ -86,6 +86,7 @@ export function initInvoker(options: IInitInvokerOptions): initInvokerResult {
           body: rawData,
           isBuffer,
           headers,
+          ossType: storageType,
         },
         (v: any) => v === undefined
       )
