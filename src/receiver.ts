@@ -16,18 +16,7 @@ export function initReceiver(
 
   return {
     receive: (event: string | IReceiveParsedPayload) =>
-      receive(event).then(res => {
-        if (res.storeType === 'oss') {
-          try {
-            const body = JSON.parse(res.body);
-            return body;
-          } catch (err) {
-            throw new Error(`Parse object content error: ${err.message}`);
-          }
-        }
-
-        return res.body;
-      }),
+      receive(event).then(res => res.body),
     reply,
   };
 }
