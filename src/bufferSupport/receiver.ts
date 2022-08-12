@@ -51,7 +51,7 @@ export function initReceiver(
 
   const receive = async (
     event: Buffer | string | IReceiveParsedPayload
-  ): Promise<{ headers?: any; body: any; storeType?: string }> => {
+  ): Promise<{ headers?: any; body: string | Buffer; storeType?: string }> => {
     let storeType: string;
     let ossKey: string | undefined;
     let body: any;
