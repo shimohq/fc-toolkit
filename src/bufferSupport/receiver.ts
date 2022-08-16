@@ -135,9 +135,11 @@ export function initReceiver(
           meta,
         };
         const ossMeta = new Map<string, any>();
-        ossMeta.set('length', Buffer.byteLength(returnValue))
+        ossMeta.set('length', Buffer.byteLength(returnValue));
 
-        await retryWrapper(() => storageClient.put(filePath, returnValue, { meta: ossMeta }));
+        await retryWrapper(() =>
+          storageClient.put(filePath, returnValue, { meta: ossMeta })
+        );
         return callback(null, body);
       }
 
