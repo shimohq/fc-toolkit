@@ -93,9 +93,13 @@ export function initReceiver(
         throw new Error('Option `ossKey` must be a string');
       }
 
-      const content: Buffer = (await retryWrapper(() =>
+      const resp = await retryWrapper(() =>
         storageClient.getAsBuffer(ossKey as string)
-      )).content;
+      )
+      if (!resp) {
+        throw new Error(`oss:${ossKey} get empty content`);
+      }
+      const content: Buffer = resp.content;
 
       storageClient.del(ossKey as string).catch(console.error);
 
