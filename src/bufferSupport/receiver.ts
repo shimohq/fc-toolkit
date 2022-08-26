@@ -95,7 +95,7 @@ export function initReceiver(
 
       const resp = await retryWrapper(() =>
         storageClient.getAsBuffer(ossKey as string)
-      )
+      );
       if (!resp) {
         throw new Error(`oss:${ossKey} get empty content`);
       }
