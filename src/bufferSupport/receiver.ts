@@ -28,6 +28,19 @@ export interface IReceiveParsedPayload {
   headers?: any;
   isBuffer?: boolean;
 }
+
+export interface ILogger {
+  debug(...data: any[]): void
+  info(...data: any[]): void
+  warn(...data: any[]): void
+  error(...data: any[]): void
+  log(...data: any[]): void
+}
+
+export interface IReceiverContext {
+  logger?: ILogger
+}
+
 export interface IReplyPayload {
   storeType: string;
   isBuffer?: boolean;
@@ -41,8 +54,9 @@ export function initReceiver(
   ossThreshold: number = 0
 ): {
   receive: (
-    event: Buffer | string | IReceiveParsedPayload
-  ) => Promise<{ headers?: any; body: any; storeType?: string }>;
+    event: Buffer | string | IReceiveParsedPayload,
+    context?: IReceiverContext
+  ) => Promise<{ headers?: any; body: any; storeType?: string, cleanup: () => Promise<void> }>;
   reply: replyFunc;
 } {
   const fcConfig = loadConfigWithEnvs(ossType);
@@ -50,8 +64,10 @@ export function initReceiver(
   const storageClient = getClientByType(ossType, storageOptions);
 
   const receive = async (
-    event: Buffer | string | IReceiveParsedPayload
-  ): Promise<{ headers?: any; body: string | Buffer; storeType?: string }> => {
+    event: Buffer | string | IReceiveParsedPayload,
+    context: IReceiverContext = {}
+  ): Promise<{ headers?: any; body: string | Buffer; storeType?: string, cleanup: () => Promise<void> }> => {
+    const logger = context.logger ?? console
     let storeType: string;
     let ossKey: string | undefined;
     let body: any;
@@ -101,16 +117,16 @@ export function initReceiver(
       }
       const content: Buffer = resp.content;
 
-      storageClient.del(ossKey as string).catch(console.error);
+      const cleanup = () => storageClient.del(ossKey as string).catch(logger.error)
 
       return omitBy(
-        { headers, body: isBuffer ? content : content.toString(), storeType },
+        { headers, body: isBuffer ? content : content.toString(), storeType, cleanup },
         (v: any) => v === undefined
       );
     }
 
     return omitBy(
-      { headers, body: isBuffer ? Buffer.from(body, 'base64') : body },
+      { headers, body: isBuffer ? Buffer.from(body, 'base64') : body, cleanup: () => Promise.resolve(void 0) },
       (v: any) => v === undefined
     );
   };
