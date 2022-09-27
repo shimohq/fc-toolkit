@@ -69,6 +69,7 @@ describe('receiver test cases', () => {
             storeType: 'direct',
             isBuffer: true,
           });
+          await resp.cleanup();
           expect(Buffer.isBuffer(resp.body)).toBeTruthy();
           expect(resp.body.toString()).toBe('test message');
         });
@@ -97,6 +98,7 @@ describe('receiver test cases', () => {
             storeType: 'oss',
             ossKey: testKey,
           });
+          await resp.cleanup();
           expect(resp.body).toBe(testContent);
         });
 
@@ -109,6 +111,7 @@ describe('receiver test cases', () => {
             ossKey: testKey,
             isBuffer: true,
           });
+          await resp.cleanup();
           expect(Buffer.isBuffer(resp.body)).toBeTruthy();
           expect(resp.body.toString()).toBe(testContent);
         });
@@ -163,7 +166,7 @@ describe('receiver test cases', () => {
             storeType: 'oss',
             ossKey: testKey,
           });
-          expect(resp).toEqual(testBody);
+          expect(resp).toEqual(JSON.stringify(testBody));
         });
       });
     });

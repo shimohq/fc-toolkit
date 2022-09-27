@@ -30,15 +30,15 @@ export interface IReceiveParsedPayload {
 }
 
 export interface ILogger {
-  debug(...data: any[]): void
-  info(...data: any[]): void
-  warn(...data: any[]): void
-  error(...data: any[]): void
-  log(...data: any[]): void
+  debug(...data: any[]): void;
+  info(...data: any[]): void;
+  warn(...data: any[]): void;
+  error(...data: any[]): void;
+  log(...data: any[]): void;
 }
 
 export interface IReceiverContext {
-  logger?: ILogger
+  logger?: ILogger;
 }
 
 export interface IReplyPayload {
@@ -46,6 +46,13 @@ export interface IReplyPayload {
   isBuffer?: boolean;
   body: string;
   meta?: any;
+}
+
+export interface IReceiveResponse {
+  headers?: any;
+  body: any;
+  storeType?: string;
+  cleanup: () => Promise<void>;
 }
 
 export function initReceiver(
@@ -56,7 +63,7 @@ export function initReceiver(
   receive: (
     event: Buffer | string | IReceiveParsedPayload,
     context?: IReceiverContext
-  ) => Promise<{ headers?: any; body: any; storeType?: string, cleanup: () => Promise<void> }>;
+  ) => Promise<IReceiveResponse>;
   reply: replyFunc;
 } {
   const fcConfig = loadConfigWithEnvs(ossType);
@@ -66,7 +73,7 @@ export function initReceiver(
   const receive = async (
     event: Buffer | string | IReceiveParsedPayload,
     context: IReceiverContext = {}
-  ): Promise<{ headers?: any; body: string | Buffer; storeType?: string, cleanup: () => Promise<void> }> => {
+  ): Promise<IReceiveResponse> => {
     const logger = context.logger ?? console
     let storeType: string;
     let ossKey: string | undefined;
@@ -117,7 +124,7 @@ export function initReceiver(
       }
       const content: Buffer = resp.content;
 
-      const cleanup = () => storageClient.del(ossKey as string).catch(logger.error)
+      const cleanup = () => storageClient.del(ossKey as string).catch(logger.error);
 
       return omitBy(
         { headers, body: isBuffer ? content : content.toString(), storeType, cleanup },
