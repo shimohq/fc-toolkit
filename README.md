@@ -136,10 +136,32 @@ const { receive, reply } = require('fc-toolkit').initReveiver(
 
 async function handler (event, context, callback) {
   try {
+    // `receive` 在从 OSS 收到 payload 后会自动将其删除
     const body = await receive(event)
     // handle the body here..
     const returnValue = await doSomethingYouNeed(body)
     await reply(callback)(returnValue)
+  } catch (e) {
+    callback(e)
+  }
+}
+```
+
+或者也可以使用 `receiveManually` 来获取包含 header 在内的更多响应内容，以及手动控制 OSS 临时对象的清理：
+
+```js
+const { receiveManually, reply } = require('fc-toolkit').initReveiver(
+  false,
+  'aws'
+)
+
+async function handler (event, context, callback) {
+  try {
+    const resp = await receiveManually(event)
+    const returnValue = await doSomethingYouNeed(resp.body)
+    await reply(callback)(returnValue)
+    // 手动调用清理回调
+    await resp.cleanup()
   } catch (e) {
     callback(e)
   }
