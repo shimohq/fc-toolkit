@@ -131,9 +131,9 @@ export function initInvoker(options: IInitInvokerOptions): initInvokerResult {
 
     const result = typeof res === 'string' ? JSON.parse(res) : res;
     if (result.storeType === 'oss' && !options.noOSS) {
-      const retBody: Buffer = (await retryWrapper(() =>
-        storageClient.getAsBuffer(result.body)
-      )).content;
+      const retBody: Buffer = (
+        await retryWrapper(() => storageClient.getAsBuffer(result.body))
+      ).content;
       storageClient.del(result.body).catch(console.error);
 
       return result.isBuffer ? retBody : retBody.toString();

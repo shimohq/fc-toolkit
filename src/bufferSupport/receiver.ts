@@ -74,7 +74,7 @@ export function initReceiver(
     event: Buffer | string | IReceiveParsedPayload,
     context: IReceiverContext = {}
   ): Promise<IReceiveResponse> => {
-    const logger = context.logger ?? console
+    const logger = context.logger ?? console;
     let storeType: string;
     let ossKey: string | undefined;
     let body: any;
@@ -124,16 +124,26 @@ export function initReceiver(
       }
       const content: Buffer = resp.content;
 
-      const cleanup = () => storageClient.del(ossKey as string).catch(logger.error);
+      const cleanup = () =>
+        storageClient.del(ossKey as string).catch(logger.error);
 
       return omitBy(
-        { headers, body: isBuffer ? content : content.toString(), storeType, cleanup },
+        {
+          headers,
+          body: isBuffer ? content : content.toString(),
+          storeType,
+          cleanup,
+        },
         (v: any) => v === undefined
       );
     }
 
     return omitBy(
-      { headers, body: isBuffer ? Buffer.from(body, 'base64') : body, cleanup: () => Promise.resolve(void 0) },
+      {
+        headers,
+        body: isBuffer ? Buffer.from(body, 'base64') : body,
+        cleanup: () => Promise.resolve(void 0),
+      },
       (v: any) => v === undefined
     );
   };

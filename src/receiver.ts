@@ -10,7 +10,9 @@ export function initReceiver(
   ossType: StorageEngine = StorageEngine.ALIYUN_OSS
 ): {
   receive: (event: string | IReceiveParsedPayload) => Promise<any>;
-  receiveManually: (event: string | IReceiveParsedPayload) => Promise<bufferSupport.IReceiveResponse>; 
+  receiveManually: (
+    event: string | IReceiveParsedPayload
+  ) => Promise<bufferSupport.IReceiveResponse>;
   reply: bufferSupport.replyFunc;
 } {
   const { receive, reply } = bufferSupport.initReceiver(noOSS, ossType, 0);
